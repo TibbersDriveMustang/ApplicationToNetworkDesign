@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/Tibbers/Google Drive/2016Summer/Algorithm Aspects of  Telecommunication Networks/Projects/project1/gs-core-1.3/gs-core-1.3.jar"/>
 	<classpathentry kind="lib" path="/Users/Tibbers/Google Drive/2016Summer/Algorithm Aspects of  Telecommunication Networks/Projects/project1/junit-4.12.jar"/>
+	<classpathentry kind="lib" path="/Library/Java/Extensions/log4j2/log4j-api-2.6.jar"/>
+	<classpathentry kind="lib" path="/Library/Java/Extensions/log4j2/log4j-core-2.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

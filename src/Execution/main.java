@@ -13,7 +13,11 @@ public class main{
 	private int k;
 	private int[][] traffic_demand;   	//bij, traffic demand from i to j and from j to i will be the same
 	private int[][] unit_cost;			//aij
+	private int[][] optCost;
 	private String student_ID;
+	private Graph graph;
+	private Vertex[] vertices;
+	private DijkstraSP dijkstraList;
 	private Integer[] d;
 	
 	
@@ -49,7 +53,7 @@ public class main{
 	}
 	
 
-	public int[][] generateTrafficDemand(){   //bij
+	public int[][] setTrafficDemand(){   //bij
 		repeatStudentID();
 		d = new Integer[Num_nodes];
 		traffic_demand = new int[Num_nodes][Num_nodes];
@@ -63,12 +67,12 @@ public class main{
 		}
 		return traffic_demand;
 	}
-	public int[][] generateUnitCost(){   //aij   k = 3,4,5...15
+	public int[][] setUnitCost(){   //aij   k = 3,4,5...15
 		//////!!!!!!!
 		int k = this.k;
 		unit_cost = new int[Num_nodes][Num_nodes];
 		for(int i = 0; i < Num_nodes; i++){
-			int[] j = generateUniqueRandomIndices(i,k);
+			int[] j = setUniqueRandomIndices(i,k);
 			int j_index = 0;
 			for(int index = 0; index < Num_nodes; index++){
 				if(j_index < k && j[j_index] == index){
@@ -86,18 +90,20 @@ public class main{
 	}
 	
 	public void repeatStudentID(){
-		Scanner user_input = new Scanner(System.in);
+		/*Scanner user_input = new Scanner(System.in);
 		System.out.println("Enter 10-digit student ID:");
 		student_ID = user_input.next();
 		student_ID = student_ID + student_ID + student_ID;
 		user_input.close();
-		
+		*/
+		student_ID = "2021221137";
+		student_ID = student_ID + student_ID + student_ID;
 		if(student_ID.length() != 30){
 			throw new RuntimeException("student ID length not correct");
 		} 
 	}
 	
-	public int[] generateUniqueRandomIndices(int i,int k){
+	public int[] setUniqueRandomIndices(int i,int k){
 		List<Integer> table = new ArrayList<Integer>();
 		int index = 0;
 		do{
@@ -118,65 +124,88 @@ public class main{
 		}
 		return m;
 	}
-	public void inputNumOfNodes(){
+	public void setNumOfNodes(){
 		Scanner user_input = new Scanner(System.in);
 		System.out.println("Enter Number of Nodes: ");
 		this.Num_nodes = user_input.nextInt();
 	}
-	
-	public void inputVauleOfK(){
+		
+	public void setK(){
 		Scanner user_input = new Scanner(System.in);
 		System.out.println("Enter Value of k ");
 		this.k = user_input.nextInt();
 	}
+	//Generate Z[][], minimum cost matrix for individual vertex
+	public int[][] setSinglePathCost(int vertex){
+	    setDijkstra(vertex);		
+	    for(int j = 0; j < this.Num_nodes; j++){
+	    	this.optCost[vertex][j] = this.traffic_demand[vertex][j] * this.dijkstraList.getDistanceTo(vertices[j].getLabel());
+	    }
+	    return this.optCost;
+	}
 	
-	public static void main(String[] args){
-		main LBJ = new main();
-		//LBJ.inputNumOfNodes();
-		LBJ.Num_nodes = 30;
-		LBJ.inputVauleOfK();
-		LBJ.generateTrafficDemand();
-		LBJ.generateUnitCost();
-		LBJ.getNodeNum();
-		LBJ.showTrafficDemand();
-		LBJ.showUnitCost();
-	    
-	    Graph graph = new Graph();
-	    Vertex[] vertices = new Vertex[LBJ.Num_nodes];
+	public void initOptCost(){
+		if(this.optCost == null)
+			this.optCost = new int[this.Num_nodes][this.Num_nodes];
+	}
+	public int[][] setTotalCost(){
+		initOptCost();
+		for(int i = 0; i < 1; i++){
+			setSinglePathCost(i);
+		}
+		return this.optCost;
+	}
+//	public void initDijkstraList(){
+//		this.dijkstra = new List<DijkstraSP>();
+//	}
+	
+	public void setDijkstra(int vertex){
+		//if(this.dijkstra[vertex] == null)
+		//if(vertices[vertex] != null)
+			//System.out.println(vertices[vertex].getLabel());
+		if(dijkstraList == null){
+			this.dijkstraList = new DijkstraSP(graph,vertices[vertex].getLabel());
+		}
+		//this.dijkstraList.add(temp);
 
+	}
+	
+	//Generate graph, vertices, edges
+	public void setGraph(){
+		this.graph = new Graph();
+		vertices = new Vertex[this.Num_nodes];
 	    for(int i = 0; i < vertices.length; i++){
 	    	vertices[i] = new Vertex(i + "");
 	    	graph.addVertex(vertices[i], true);
 	    }
 	    for(int i = 0; i < vertices.length; i++){
 	    	for(int j = 0; j < vertices.length; j++){
-	    		if(LBJ.unit_cost[i][j] != 0){
-	    			Edge temp = new Edge(vertices[i],vertices[j],LBJ.unit_cost[i][j]);
+	    		if(this.unit_cost[i][j] != 0){
+	    			Edge temp = new Edge(vertices[i],vertices[j],this.unit_cost[i][j]);
 	    			graph.addEdge(temp.getOne(), temp.getTwo(),temp.getWeight());
 	    		}
 	    	}
 	    }
-/*	        
-	    Edge[] edges = new Edge[9];
-	    edges[0] = new Edge(vertices[0], vertices[1], 7);
-	    edges[1] = new Edge(vertices[0], vertices[2], 9);
-	    edges[2] = new Edge(vertices[0], vertices[5], 14);
-	    edges[3] = new Edge(vertices[1], vertices[2], 10);
-	    edges[4] = new Edge(vertices[1], vertices[3], 15);
-	    edges[5] = new Edge(vertices[2], vertices[3], 11);
-	    edges[6] = new Edge(vertices[2], vertices[5], 2);
-	    edges[7] = new Edge(vertices[3], vertices[4], 6);
-	    edges[8] = new Edge(vertices[4], vertices[5], 9);
-	        
-	    for(Edge e: edges){
-	    	graph.addEdge(e.getOne(), e.getTwo(), e.getWeight());
-	    }
-*/	        
-	    //e.g  Zij  0 -> 5
-	    DijkstraSP dijkstra0 = new DijkstraSP(graph, vertices[0].getLabel());
-	    List<Vertex> Z = dijkstra0.getPathTo(vertices[5].getLabel());
-	    int minCost = LBJ.traffic_demand[0][6] * dijkstra0.getDistanceTo(vertices[6].getLabel());
-	    System.out.println("minCost :" + minCost);
+	}
+	
+	
+	public static void main(String[] args){
+		main LBJ = new main();
+		//LBJ.inputNumOfNodes();
+		LBJ.Num_nodes = 30;
+		LBJ.setK();
+		LBJ.setTrafficDemand();
+		LBJ.setUnitCost();
+		LBJ.getNodeNum();
+		LBJ.showTrafficDemand();
+		LBJ.showUnitCost();
+	    LBJ.setGraph();
+	    
+	    LBJ.setTotalCost();
+	    
+	    //List<Vertex> Z1 = dijkstra0.getPathTo(vertices[5].getLabel());
+	    //int minCost = LBJ.traffic_demand[0][0] * dijkstra0.getDistanceTo(vertices[0].getLabel());
+	    //System.out.println("minCost :" + minCost);
 	    /*	    Set<Edge> temp = graph.getEdges();
 	    int totalWeight = 0;
 	    for(int i = 0; i < Z.size() - 1; i ++){
@@ -187,8 +216,8 @@ public class main{
 	    	}
 	    }
 */
-	    System.out.println(dijkstra0.getDistanceTo(vertices[6].getLabel()));
-	    System.out.println(dijkstra0.getPathTo(vertices[6].getLabel()));
+	    //System.out.println(dijkstra0.getDistanceTo(vertices[6].getLabel()));
+	    //System.out.println(dijkstra0.getPathTo(vertices[6].getLabel()));
 	}						
 		
 	

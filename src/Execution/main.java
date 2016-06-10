@@ -1,17 +1,17 @@
-package Network;
+package Execution;
+
 import java.util.*;
 import org.graphstream.*;
 import org.junit.*;
-
-import com.sun.corba.se.impl.orbutil.graph.Graph;
-
+//import com.sun.corba.se.impl.orbutil.graph.Graph;
 import org.apache.logging.log4j.*;
 import shortestPath.*;
+import Network.*;
 
 public class main{
 	private int Num_nodes;
 	private int k;
-	private int[][] traffic_demand;   	//bij
+	private int[][] traffic_demand;   	//bij, traffic demand from i to j and from j to i will be the same
 	private int[][] unit_cost;			//aij
 	private String student_ID;
 	private Integer[] d;
@@ -110,7 +110,8 @@ public class main{
 		while(index < k);
 		  //set is in increasing order
 		Collections.sort(table);
-		System.out.println(i +" : " + table.toString());
+		//System.out.println("min outging edges: ");
+		//System.out.println(i +" : " + table.toString());
 		int[] m = new int[k];
 		for(int j = 0; j < k; j++){
 			m[j] = table.get(j);
@@ -131,18 +132,65 @@ public class main{
 	
 	public static void main(String[] args){
 		main LBJ = new main();
-		LBJ.inputNumOfNodes();
+		//LBJ.inputNumOfNodes();
+		LBJ.Num_nodes = 30;
 		LBJ.inputVauleOfK();
 		LBJ.generateTrafficDemand();
 		LBJ.generateUnitCost();
 		LBJ.getNodeNum();
 		LBJ.showTrafficDemand();
 		LBJ.showUnitCost();
+	    
+	    Graph graph = new Graph();
+	    Vertex[] vertices = new Vertex[LBJ.Num_nodes];
+
+	    for(int i = 0; i < vertices.length; i++){
+	    	vertices[i] = new Vertex(i + "");
+	    	graph.addVertex(vertices[i], true);
+	    }
+	    for(int i = 0; i < vertices.length; i++){
+	    	for(int j = 0; j < vertices.length; j++){
+	    		if(LBJ.unit_cost[i][j] != 0){
+	    			Edge temp = new Edge(vertices[i],vertices[j],LBJ.unit_cost[i][j]);
+	    			graph.addEdge(temp.getOne(), temp.getTwo(),temp.getWeight());
+	    		}
+	    	}
+	    }
+/*	        
+	    Edge[] edges = new Edge[9];
+	    edges[0] = new Edge(vertices[0], vertices[1], 7);
+	    edges[1] = new Edge(vertices[0], vertices[2], 9);
+	    edges[2] = new Edge(vertices[0], vertices[5], 14);
+	    edges[3] = new Edge(vertices[1], vertices[2], 10);
+	    edges[4] = new Edge(vertices[1], vertices[3], 15);
+	    edges[5] = new Edge(vertices[2], vertices[3], 11);
+	    edges[6] = new Edge(vertices[2], vertices[5], 2);
+	    edges[7] = new Edge(vertices[3], vertices[4], 6);
+	    edges[8] = new Edge(vertices[4], vertices[5], 9);
+	        
+	    for(Edge e: edges){
+	    	graph.addEdge(e.getOne(), e.getTwo(), e.getWeight());
+	    }
+*/	        
+	    //e.g  Zij  0 -> 5
+	    DijkstraSP dijkstra0 = new DijkstraSP(graph, vertices[0].getLabel());
+	    List<Vertex> Z = dijkstra0.getPathTo(vertices[5].getLabel());
+	    int minCost = LBJ.traffic_demand[0][6] * dijkstra0.getDistanceTo(vertices[6].getLabel());
+	    System.out.println("minCost :" + minCost);
+	    /*	    Set<Edge> temp = graph.getEdges();
+	    int totalWeight = 0;
+	    for(int i = 0; i < Z.size() - 1; i ++){
+	    	for(Edge temp2: temp){
+	    		if(temp2.getOne() == Z.get(i) && temp2.getTwo() == Z.get(i + 1)){
+	    			totalWeight +=temp2.getWeight();
+	    		}
+	    	}
+	    }
+*/
+	    System.out.println(dijkstra0.getDistanceTo(vertices[6].getLabel()));
+	    System.out.println(dijkstra0.getPathTo(vertices[6].getLabel()));
+	}						
 		
-		Dijkstra SP = new Dijkstra(LBJ.getNodeNum());
-		
-		
-		
-	}
+	
 	
 }

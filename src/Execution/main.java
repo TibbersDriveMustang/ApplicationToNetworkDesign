@@ -17,9 +17,13 @@ public class main{
 	private String student_ID;
 	private Graph graph;
 	private Vertex[] vertices;
-	private DijkstraSP dijkstraList;
+	private DijkstraSP[] dijkstraList;
 	private Integer[] d;
 	
+	public main(int Nums){
+		this.Num_nodes = Nums;
+		this.dijkstraList = new DijkstraSP[this.Num_nodes];
+	}
 	
 	public int getNodeNum(){
 		System.out.println("Node Number is: " + Num_nodes);
@@ -33,6 +37,7 @@ public class main{
 		return traffic_demand[i][j];
 	}
 	public void showTrafficDemand(){
+		System.out.println("Traffic Demand Matrix b: ");
 		for(int i = 0; i < Num_nodes; i++){
 			for(int j = 0; j < Num_nodes;j++){
 				System.out.print(traffic_demand[i][j] + "	");
@@ -44,6 +49,7 @@ public class main{
 		return unit_cost[i][j];
 	}
 	public void showUnitCost(){
+		System.out.println("Unit Cost Matrix a: ");
 		for(int i = 0; i < Num_nodes; i++){
 			for(int j = 0; j < Num_nodes;j++){
 				System.out.print(unit_cost[i][j] + "	");
@@ -139,7 +145,7 @@ public class main{
 	public int[][] setSinglePathCost(int vertex){
 	    setDijkstra(vertex);		
 	    for(int j = 0; j < this.Num_nodes; j++){
-	    	this.optCost[vertex][j] = this.traffic_demand[vertex][j] * this.dijkstraList.getDistanceTo(vertices[j].getLabel());
+	    	this.optCost[vertex][j] = this.traffic_demand[vertex][j] * this.dijkstraList[vertex].getDistanceTo(vertices[j].getLabel());
 	    }
 	    return this.optCost;
 	}
@@ -148,6 +154,11 @@ public class main{
 		if(this.optCost == null)
 			this.optCost = new int[this.Num_nodes][this.Num_nodes];
 	}
+	
+//	public List<Vertex> showPath(int head, int end){
+//		this.dijkstraList.getPathTo(destinationLabel)
+//	}
+	
 	public void showOptCost(){
 		System.out.println("Optimal Cost Matrix Z: ");
 		for(int i = 0; i < this.Num_nodes; i++){
@@ -160,10 +171,16 @@ public class main{
 	
 	public int[][] setTotalCost(){
 		initOptCost();
-		for(int i = 0; i < 1; i++){
+		for(int i = 0; i < this.Num_nodes; i++){
 			setSinglePathCost(i);
 		}
 		return this.optCost;
+	}
+	
+	public int getTotalCost(){
+		int total = 0;
+		
+		return total;
 	}
 //	public void initDijkstraList(){
 //		this.dijkstra = new List<DijkstraSP>();
@@ -173,8 +190,8 @@ public class main{
 		//if(this.dijkstra[vertex] == null)
 		//if(vertices[vertex] != null)
 			//System.out.println(vertices[vertex].getLabel());
-		if(dijkstraList == null){
-			this.dijkstraList = new DijkstraSP(graph,vertices[vertex].getLabel());
+		if(dijkstraList[vertex] == null){
+			this.dijkstraList[vertex] = new DijkstraSP(graph,vertices[vertex].getLabel());
 		}
 		//this.dijkstraList.add(temp);
 
@@ -200,9 +217,7 @@ public class main{
 	
 	
 	public static void main(String[] args){
-		main LBJ = new main();
-		//LBJ.inputNumOfNodes();
-		LBJ.Num_nodes = 30;
+		main LBJ = new main(5);
 		LBJ.setK();
 		LBJ.setTrafficDemand();
 		LBJ.setUnitCost();
@@ -213,21 +228,7 @@ public class main{
 	    LBJ.setTotalCost();
 	    LBJ.showOptCost();
 	    
-	    //List<Vertex> Z1 = dijkstra0.getPathTo(vertices[5].getLabel());
-	    //int minCost = LBJ.traffic_demand[0][0] * dijkstra0.getDistanceTo(vertices[0].getLabel());
-	    //System.out.println("minCost :" + minCost);
-	    /*	    Set<Edge> temp = graph.getEdges();
-	    int totalWeight = 0;
-	    for(int i = 0; i < Z.size() - 1; i ++){
-	    	for(Edge temp2: temp){
-	    		if(temp2.getOne() == Z.get(i) && temp2.getTwo() == Z.get(i + 1)){
-	    			totalWeight +=temp2.getWeight();
-	    		}
-	    	}
-	    }
-*/
-	    //System.out.println(dijkstra0.getDistanceTo(vertices[6].getLabel()));
-	    //System.out.println(dijkstra0.getPathTo(vertices[6].getLabel()));
+
 	    System.out.println("TEST");
 	}						
 		

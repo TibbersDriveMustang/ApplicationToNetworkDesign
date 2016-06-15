@@ -1,12 +1,19 @@
 package Execution;
 
 import java.util.*;
+
 import org.graphstream.*;
 import org.junit.*;
 //import com.sun.corba.se.impl.orbutil.graph.Graph;
 import org.apache.logging.log4j.*;
 import shortestPath.*;
 import Network.*;
+import Network.Graph;
+import edu.uci.ics.jung.algorithms.layout.CircleLayout;
+import edu.uci.ics.jung.graph.*;
+import edu.uci.ics.jung.visualization.*;
+import java.awt.Dimension;
+import javax.swing.JFrame;
 
 public class main{
 	private int Num_nodes;
@@ -228,6 +235,18 @@ public class main{
 	    LBJ.setTotalCost();
 	    LBJ.showOptCost();
 	    
+	    DirectedSparseGraph sample = new DirectedSparseGraph();
+	    sample.addVertex("Vertex1");
+	    sample.addVertex("Vertex2");
+	    sample.addVertex("Vertex3");
+	    sample.addEdge("Edge1","Vertex1","Vertex2");
+	    
+	    VisualizationImageServer vs = new VisualizationImageServer(new CircleLayout(sample),new Dimension(200,200));
+	    JFrame frame = new JFrame();
+	    frame.getContentPane().add(vs);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    frame.pack();
+	    frame.setVisible(true);
 
 	    System.out.println("TEST");
 	}						

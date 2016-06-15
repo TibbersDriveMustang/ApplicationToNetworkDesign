@@ -6,5 +6,7 @@
 	<classpathentry kind="lib" path="/Users/Tibbers/Google Drive/2016Summer/Algorithm Aspects of  Telecommunication Networks/Projects/project1/junit-4.12.jar"/>
 	<classpathentry kind="lib" path="/Library/Java/Extensions/log4j2/log4j-api-2.6.jar"/>
 	<classpathentry kind="lib" path="/Library/Java/Extensions/log4j2/log4j-core-2.6.jar"/>
+	<classpathentry kind="lib" path="/Users/Tibbers/Google Drive/2016Summer/Algorithm Aspects of  Telecommunication Networks/Projects/project1/jung2-2_0_1/jung-graph-impl-2.0.1.jar"/>
+	<classpathentry kind="lib" path="/Users/Tibbers/Google Drive/2016Summer/Algorithm Aspects of  Telecommunication Networks/Projects/project1/jung2-2_0_1/jung-visualization-2.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -135,7 +135,7 @@ public class main{
 		System.out.println("Enter Value of k ");
 		this.k = user_input.nextInt();
 	}
-	//Generate Z[][], minimum cost matrix for individual vertex
+	//Generate Z[vertex][], minimum cost matrix for individual vertex
 	public int[][] setSinglePathCost(int vertex){
 	    setDijkstra(vertex);		
 	    for(int j = 0; j < this.Num_nodes; j++){
@@ -148,6 +148,16 @@ public class main{
 		if(this.optCost == null)
 			this.optCost = new int[this.Num_nodes][this.Num_nodes];
 	}
+	public void showOptCost(){
+		System.out.println("Optimal Cost Matrix Z: ");
+		for(int i = 0; i < this.Num_nodes; i++){
+			for(int j = 0; j < this.Num_nodes; j++){
+				System.out.print(this.optCost[i][j] + "  ");
+			}
+			System.out.println("");
+		}
+	}
+	
 	public int[][] setTotalCost(){
 		initOptCost();
 		for(int i = 0; i < 1; i++){
@@ -200,8 +210,8 @@ public class main{
 		LBJ.showTrafficDemand();
 		LBJ.showUnitCost();
 	    LBJ.setGraph();
-	    
 	    LBJ.setTotalCost();
+	    LBJ.showOptCost();
 	    
 	    //List<Vertex> Z1 = dijkstra0.getPathTo(vertices[5].getLabel());
 	    //int minCost = LBJ.traffic_demand[0][0] * dijkstra0.getDistanceTo(vertices[0].getLabel());
@@ -218,6 +228,7 @@ public class main{
 */
 	    //System.out.println(dijkstra0.getDistanceTo(vertices[6].getLabel()));
 	    //System.out.println(dijkstra0.getPathTo(vertices[6].getLabel()));
+	    System.out.println("TEST");
 	}						
 		
 	

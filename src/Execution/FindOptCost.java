@@ -10,17 +10,22 @@ import org.apache.logging.log4j.*;
 import shortestPath.*;
 import Network.*;
 import Network.Graph;
-import edu.uci.ics.jung.algorithms.layout.*;
+import edu.uci.ics.jung.algorithms.layout.CircleLayout;
+import edu.uci.ics.jung.algorithms.shortestpath.*;
 import edu.uci.ics.jung.graph.*;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.visualization.*;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+import edu.uci.ics.jung.graph.*;
+
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Paint;
 
 import javax.swing.JFrame;
+
+
 
 
 
@@ -34,14 +39,18 @@ public class FindOptCost{
 	private int OptTotalCost;
 	private int numDirectedEdge;
 	private Network.Graph graph;
+	private edu.uci.ics.jung.graph.Graph<Vertex, Edge> graph0;
 	edu.uci.ics.jung.graph.UndirectedGraph<Vertex, Edge> graphToShow;
+	private DijkstraShortestPath<Vertex,Edge>[] DPath;
 	private Vertex[] vertices;
+	//private V[] vertices0;
 	private DijkstraSP[] dijkstraList;
 	private Integer[] d;
 	
 	public FindOptCost(int Nums){
 		this.Num_nodes = Nums;
 		this.dijkstraList = new DijkstraSP[this.Num_nodes];
+		this.DPath = new DijkstraShortestPath[this.Num_nodes];
 		this.OptTotalCost = 0;
 		this.numDirectedEdge = 0;
 	}
@@ -104,7 +113,7 @@ public class FindOptCost{
 			for(int index = 0; index < Num_nodes; index++){
 				if(j_index < k && j[j_index] == index){
 					j_index++;
-					unit_cost[i][index] = 1;
+					unit_cost[i][index] = 3;
 					this.numDirectedEdge++;
 				}
 				else if(i != index){
@@ -182,11 +191,27 @@ public class FindOptCost{
 		}
 	}
 	
+	public void setDijkstra(int vertex){
+		if(dijkstraList[vertex] == null){
+			this.dijkstraList[vertex] = new DijkstraSP(graph,vertices[vertex].getLabel());
+		}
+	    Transformer<Edge,Number> weightTransformer = new Transformer<Edge,Number>(){
+	    	public Number transform(Edge i){
+	    		return i.getWeight();
+	    	}
+	    };
+		this.DPath[vertex] = new DijkstraShortestPath(graph0,weightTransformer);
+	}
+	
 	//Generate Z[vertex][], minimum cost matrix for individual vertex
 	public int[][] setSinglePathCost(int vertex){
 	    setDijkstra(vertex);		
 	    for(int j = 0; j < this.Num_nodes; j++){
+	    	//optCost would be 0 is there is no traffic demand
 	    	this.optCost[vertex][j] = this.traffic_demand[vertex][j] * this.dijkstraList[vertex].getDistanceTo(vertices[j].getLabel());
+	    	System.out.println("Opt Distance from " + vertex + " to " + j + " is :" + this.dijkstraList[vertex].getDistanceTo(vertices[j].getLabel()));
+			List<Vertex> temp = this.dijkstraList[vertex].getPathTo(vertices[j].getLabel());
+			System.out.println("Opt Path from " + vertex + " to " + j + " is :" + temp);
 	    	this.OptTotalCost = this.OptTotalCost + this.optCost[vertex][j];
 	    }
 	    return this.optCost;
@@ -200,9 +225,21 @@ public class FindOptCost{
 		return this.optCost;
 	}
 	
+	public List<Vertex> getPath(int from, int to){
+		List<Vertex> temp = this.dijkstraList[from].getPathTo(vertices[to].getLabel());
+		System.out.println("Opt Path from " + from + " to " + to + " is :" + temp);
+		return temp;
+	}
+	
+	public int getDistance(int from, int to){
+		int temp = this.dijkstraList[from].getDistanceTo(vertices[to].getLabel());
+		System.out.println("Opt Distance from " + from + " to " + to + " is :" + temp);
+		return temp;
+	}
+	
 	public void setOptGraph(){
 		for(int i = 0; i < this.Num_nodes; i++){
-			for(int j = 0; j < this.Num_nodes;j++){
+			for(int j = i + 1; j < this.Num_nodes;j++){
 		    	List<Vertex> tempPath = this.dijkstraList[i].getPathTo(vertices[j].getLabel());
 		    	for(int index = 0; index < tempPath.size() - 1; index++)
 		    	{	Edge tempEdge = new Edge(tempPath.get(index), tempPath.get(index + 1),this.getUnitCost(tempPath.get(index).getIndex(), tempPath.get(index + 1).getIndex()));
@@ -215,20 +252,9 @@ public class FindOptCost{
 		}
 	}
 	
-
-	
 	public int getTotalCost(){
 		int total = 0;
-		
 		return total;
-	}
-	
-	public void setDijkstra(int vertex){
-		if(dijkstraList[vertex] == null){
-			this.dijkstraList[vertex] = new DijkstraSP(graph,vertices[vertex].getLabel());
-		}
-
-
 	}
 	
 	//Generate graph, vertices, edges
@@ -238,6 +264,7 @@ public class FindOptCost{
 	    for(int i = 0; i < vertices.length; i++){
 	    	vertices[i] = new Vertex(i + "");
 	    	graph.addVertex(vertices[i], true);
+	    	//graph0.addVertex(vertices[i]);
 	    	this.graphToShow.addVertex(vertices[i]);
 	    }
 	    for(int i = 0; i < vertices.length; i++){
@@ -245,6 +272,7 @@ public class FindOptCost{
 	    		if(this.unit_cost[i][j] != 0){
 	    			Edge temp = new Edge(vertices[i],vertices[j],this.unit_cost[i][j]);
 	    			graph.addEdge(temp.getOne(), temp.getTwo(),temp.getWeight());
+	    			//graph0.a
 	    			//if(temp.getWeight() < 300)	
 	    			//	this.graphToShow.addEdge(temp, temp.getOne(), temp.getTwo(), EdgeType.UNDIRECTED);
 	    		}
@@ -323,13 +351,16 @@ public class FindOptCost{
 	}
 	
 	public static void main(String[] args){
-		FindOptCost LBJ = new FindOptCost(30);
+		FindOptCost LBJ = new FindOptCost(5);
 		
-		LBJ.Run(3);
+		LBJ.Run(2);
 		LBJ.showTrafficDemand();
 		LBJ.showUnitCost();
 		LBJ.showOptCostMatrix();
 		LBJ.getOptGraph();
+		LBJ.getPath(0, 1);
+		LBJ.getDistance(0, 1);
+		/*
 		LBJ.Run(4);
 	    LBJ.Run(5);
 	    LBJ.Run(6);
@@ -350,5 +381,6 @@ public class FindOptCost{
 		LBJ.showUnitCost();
 		LBJ.showOptCostMatrix();
 		LBJ.getOptGraph();
+		*/
 	}									
 }

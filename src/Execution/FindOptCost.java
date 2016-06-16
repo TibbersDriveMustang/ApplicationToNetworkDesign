@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 
 
 
-public class main{
+public class FindOptCost{
 	private int Num_nodes;
 	private int k;
 	private int[][] traffic_demand;   	//bij, traffic demand from i to j and from j to i will be the same
@@ -32,17 +32,18 @@ public class main{
 	private int[][] optCost;
 	private String student_ID;
 	private int OptTotalCost;
+	private int numDirectedEdge;
 	private Network.Graph graph;
-//	edu.uci.ics.jung.graph.Graph graphToShow;
+	edu.uci.ics.jung.graph.UndirectedGraph<Vertex, Edge> graphToShow;
 	private Vertex[] vertices;
 	private DijkstraSP[] dijkstraList;
 	private Integer[] d;
 	
-	public main(int Nums){
+	public FindOptCost(int Nums){
 		this.Num_nodes = Nums;
 		this.dijkstraList = new DijkstraSP[this.Num_nodes];
 		this.OptTotalCost = 0;
-//		this.graphToShow = new DirectedSparseMultigraph<Vertex,Edge>();
+		this.numDirectedEdge = 0;
 	}
 	
 	public int getNodeNum(){
@@ -95,6 +96,7 @@ public class main{
 	}
 	public int[][] setUnitCost(){   //aij   k = 3,4,5...15
 		int k = this.k;
+		this.numDirectedEdge = 0;
 		unit_cost = new int[Num_nodes][Num_nodes];
 		for(int i = 0; i < Num_nodes; i++){
 			int[] j = setUniqueRandomIndices(i,k);
@@ -103,9 +105,11 @@ public class main{
 				if(j_index < k && j[j_index] == index){
 					j_index++;
 					unit_cost[i][index] = 1;
+					this.numDirectedEdge++;
 				}
 				else if(i != index){
 					unit_cost[i][index] = 300;
+					//this.numDirectedEdge++;
 				}
 				else if(i == index)
 					unit_cost[i][index] = 0; 
@@ -151,6 +155,7 @@ public class main{
 	}
 		
 	public void setK(int k){
+		this.graphToShow = new UndirectedSparseGraph();
 		//Scanner user_input = new Scanner(System.in);
 		//System.out.println("Enter Value of k ");
 		//this.k = user_input.nextInt();
@@ -159,22 +164,13 @@ public class main{
 		this.k = k;
 		System.out.println("=======  For k = " + k + "  =======");
 	}
-	//Generate Z[vertex][], minimum cost matrix for individual vertex
-	public int[][] setSinglePathCost(int vertex){
-	    setDijkstra(vertex);		
-	    for(int j = 0; j < this.Num_nodes; j++){
-	    	this.optCost[vertex][j] = this.traffic_demand[vertex][j] * this.dijkstraList[vertex].getDistanceTo(vertices[j].getLabel());
-	    	this.OptTotalCost = this.OptTotalCost + this.optCost[vertex][j];
-	    }
-	    return this.optCost;
-	}
 	
 	public void initOptCost(){
 		if(this.optCost == null)
 			this.optCost = new int[this.Num_nodes][this.Num_nodes];
 	}
 	
-	public void showOptCost(){
+	public void showOptCostMatrix(){
 		System.out.println("Optimal Cost Matrix Z: ");
 		for(int i = 0; i < this.Num_nodes; i++){
 			for(int j = 0; j < this.Num_nodes; j++){
@@ -186,13 +182,40 @@ public class main{
 		}
 	}
 	
-	public int[][] setTotalCost(){
+	//Generate Z[vertex][], minimum cost matrix for individual vertex
+	public int[][] setSinglePathCost(int vertex){
+	    setDijkstra(vertex);		
+	    for(int j = 0; j < this.Num_nodes; j++){
+	    	this.optCost[vertex][j] = this.traffic_demand[vertex][j] * this.dijkstraList[vertex].getDistanceTo(vertices[j].getLabel());
+	    	this.OptTotalCost = this.OptTotalCost + this.optCost[vertex][j];
+	    }
+	    return this.optCost;
+	}
+	public int[][] setTotalCostMatrix(){
 		initOptCost();
 		for(int i = 0; i < this.Num_nodes; i++){
 			setSinglePathCost(i);
 		}
+		setOptGraph();
 		return this.optCost;
 	}
+	
+	public void setOptGraph(){
+		for(int i = 0; i < this.Num_nodes; i++){
+			for(int j = 0; j < this.Num_nodes;j++){
+		    	List<Vertex> tempPath = this.dijkstraList[i].getPathTo(vertices[j].getLabel());
+		    	for(int index = 0; index < tempPath.size() - 1; index++)
+		    	{	Edge tempEdge = new Edge(tempPath.get(index), tempPath.get(index + 1),this.getUnitCost(tempPath.get(index).getIndex(), tempPath.get(index + 1).getIndex()));
+		    		if(!this.graphToShow.containsEdge(tempEdge))
+		    		{
+		    			this.graphToShow.addEdge(tempEdge, tempPath.get(index), tempPath.get(index + 1), EdgeType.UNDIRECTED);
+		    		}
+		    	}
+			}
+		}
+	}
+	
+
 	
 	public int getTotalCost(){
 		int total = 0;
@@ -215,15 +238,15 @@ public class main{
 	    for(int i = 0; i < vertices.length; i++){
 	    	vertices[i] = new Vertex(i + "");
 	    	graph.addVertex(vertices[i], true);
-//	    	graphToShow.addVertex(vertices[i]);
+	    	this.graphToShow.addVertex(vertices[i]);
 	    }
 	    for(int i = 0; i < vertices.length; i++){
 	    	for(int j = 0; j < vertices.length; j++){
 	    		if(this.unit_cost[i][j] != 0){
 	    			Edge temp = new Edge(vertices[i],vertices[j],this.unit_cost[i][j]);
 	    			graph.addEdge(temp.getOne(), temp.getTwo(),temp.getWeight());
-	    		//	if(this.unit_cost[i][j] < 300)	
-	    		//		graphToShow.addEdge(temp,temp.getOne(),temp.getTwo());
+	    			//if(temp.getWeight() < 300)	
+	    			//	this.graphToShow.addEdge(temp, temp.getOne(), temp.getTwo(), EdgeType.UNDIRECTED);
 	    		}
 	    	}
 	    }
@@ -234,32 +257,27 @@ public class main{
 		return this.OptTotalCost;
 	}
 	
-	public void Run(int k){
-		this.setK(k);
-		this.setTrafficDemand();  //bij
-		this.setUnitCost();		//aij
-		this.showTrafficDemand();
-		this.showUnitCost();
-	    this.setGraph();
-	    this.setTotalCost();
-	    this.showOptCost();
-	    this.getOptTotalCost();
+	public float getDensity(){
+		float density = 0;
+		density = this.numDirectedEdge/this.Num_nodes * (this.Num_nodes - 1);
+		System.out.println("Density is : " + density);
+		return density;
 	}
-	
-	
-	public static void main(String[] args){
-		main LBJ = new main(10);
 		
-		LBJ.Run(3);
-		LBJ.showOptPath();
-	    LBJ.Run(5);
-
-/*	   
-	    BasicVisualizationServer vs = new BasicVisualizationServer(new DAGLayout(LBJ.graphToShow),new Dimension(1000,800));
+	public void getOptGraph(){
+		CircleLayout temp = new CircleLayout(this.graphToShow);
+		temp.setRadius(380);
+		BasicVisualizationServer vs = new BasicVisualizationServer(temp,new Dimension(1000,800));
 	    
 	    Transformer<Vertex,Paint> vertexToPaint = new Transformer<Vertex,Paint>(){
 	    	public Paint transform(Vertex i){
 	    		return Color.red;
+	    	}
+	    };
+	    
+	    Transformer<Edge,Paint> EdgeToPaint = new Transformer<Edge,Paint>(){
+	    	public Paint transform(Edge i){
+	    		return Color.green;
 	    	}
 	    };
 	    Transformer<Vertex,String> vertexToLabel = new Transformer<Vertex,String>(){
@@ -274,19 +292,63 @@ public class main{
 	    };
 	    
 	    vs.getRenderContext().setVertexDrawPaintTransformer(vertexToPaint);
+	    //vs.getRenderContext().setEdgeFillPaintTransformer(EdgeToPaint);
 	    vs.getRenderContext().setVertexLabelTransformer(vertexToLabel);
 	    vs.getRenderContext().setEdgeLabelTransformer(edgeToLabel);
 	    vs.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 	    
-	    JFrame frame = new JFrame("Optimal Cost Topology");
+	    JFrame frame = new JFrame("Optimal Path Topology for k = " + this.k + " Total Cost: " + this.OptTotalCost + " Density: " + this.getDensity());
 	    frame.getContentPane().add(vs);
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.pack();
 	    frame.setVisible(true);
-*/
-	    
-	}						
+	}
+	
+	public void Run(int k){
+		this.setK(k);
+		this.setTrafficDemand();  //bij
+		this.setUnitCost();		//aij
+		//this.showTrafficDemand();
+		//this.showUnitCost();
+	    this.setGraph();
+	    this.setTotalCostMatrix();
+	    //this.showOptCostMatrix();
+	    this.getOptTotalCost();
+	    this.getDensity();
+	    /*
+	    Scanner user_input = new Scanner(System.in);
+	    System.out.println("Enter Any to continue: ");
+	    String temp = user_input.nextLine();
+	    */
+	}
+	
+	public static void main(String[] args){
+		FindOptCost LBJ = new FindOptCost(30);
 		
-	
-	
+		LBJ.Run(3);
+		LBJ.showTrafficDemand();
+		LBJ.showUnitCost();
+		LBJ.showOptCostMatrix();
+		LBJ.getOptGraph();
+		LBJ.Run(4);
+	    LBJ.Run(5);
+	    LBJ.Run(6);
+	    LBJ.Run(7);
+	    LBJ.Run(8);
+	    LBJ.Run(9);
+		LBJ.showTrafficDemand();
+		LBJ.showUnitCost();
+		LBJ.showOptCostMatrix();
+		LBJ.getOptGraph();
+	    LBJ.Run(10);
+	    LBJ.Run(11);
+	    LBJ.Run(12);
+	    LBJ.Run(13);
+	    LBJ.Run(14);
+	    LBJ.Run(15);
+		LBJ.showTrafficDemand();
+		LBJ.showUnitCost();
+		LBJ.showOptCostMatrix();
+		LBJ.getOptGraph();
+	}									
 }

@@ -26,6 +26,10 @@ public class Vertex {
         this.neighborhood = new ArrayList<Edge>();
     }
     
+    public int getIndex(){
+    	int index = Integer.parseInt(this.label);
+    	return index;
+    }
     
     /**
      * This method adds an Edge to the incidence neighborhood of this graph iff

@@ -22,8 +22,6 @@ import java.awt.Paint;
 
 import javax.swing.JFrame;
 
-
-
 public class FindOptCost{
 	private int Num_nodes;
 	private int k;
@@ -85,7 +83,7 @@ public class FindOptCost{
 		d = new Integer[Num_nodes];
 		traffic_demand = new int[Num_nodes][Num_nodes];
 		for(int i = 0; i < Num_nodes; i++){
-			d[i] = Character.getNumericValue(student_ID.charAt(i)) ;
+			d[i] = Character.getNumericValue(student_ID.charAt(i));
 		}
 		for(int i = 0; i < Num_nodes; i++){
 			for(int j = 0; j < Num_nodes; j++){
@@ -156,6 +154,11 @@ public class FindOptCost{
 		
 	public void setK(int k){
 		this.graphToShow = new UndirectedSparseGraph();
+		this.OptTotalCost = 0;
+		this.optCost = null;
+		this.unit_cost = null;
+		this.traffic_demand = null;
+		this.initOptCost();
 		//Scanner user_input = new Scanner(System.in);
 		//System.out.println("Enter Value of k ");
 		//this.k = user_input.nextInt();
@@ -167,7 +170,9 @@ public class FindOptCost{
 	
 	public void initOptCost(){
 		if(this.optCost == null)
+		{	System.out.println("Initiated");
 			this.optCost = new int[this.Num_nodes][this.Num_nodes];
+		}
 	}
 	
 	public void showOptCostMatrix(){
@@ -323,32 +328,44 @@ public class FindOptCost{
 	}
 	
 	public static void main(String[] args){
-		FindOptCost LBJ = new FindOptCost(30);
-		
-		LBJ.Run(3);
-		LBJ.showTrafficDemand();
-		LBJ.showUnitCost();
-		LBJ.showOptCostMatrix();
-		LBJ.getOptGraph();
-		LBJ.Run(4);
-	    LBJ.Run(5);
-	    LBJ.Run(6);
-	    LBJ.Run(7);
-	    LBJ.Run(8);
-	    LBJ.Run(9);
-		LBJ.showTrafficDemand();
-		LBJ.showUnitCost();
-		LBJ.showOptCostMatrix();
-		LBJ.getOptGraph();
-	    LBJ.Run(10);
-	    LBJ.Run(11);
-	    LBJ.Run(12);
-	    LBJ.Run(13);
-	    LBJ.Run(14);
-	    LBJ.Run(15);
-		LBJ.showTrafficDemand();
-		LBJ.showUnitCost();
-		LBJ.showOptCostMatrix();
-		LBJ.getOptGraph();
+		FindOptCost LBJ3 = new FindOptCost(30);
+		LBJ3.Run(3);
+		LBJ3.showTrafficDemand();
+		LBJ3.showUnitCost();
+		LBJ3.showOptCostMatrix();
+		LBJ3.getOptGraph();
+		FindOptCost LBJ4 = new FindOptCost(30);
+		LBJ4.Run(4);
+		FindOptCost LBJ5 = new FindOptCost(30);
+		LBJ5.Run(5);
+		FindOptCost LBJ6 = new FindOptCost(30);
+		LBJ6.Run(6);
+		FindOptCost LBJ7 = new FindOptCost(30);
+		LBJ7.Run(7);
+		FindOptCost LBJ8 = new FindOptCost(30);
+		LBJ8.Run(8);
+		FindOptCost LBJ9 = new FindOptCost(30);
+		LBJ9.Run(9);
+		LBJ9.showTrafficDemand();
+		LBJ9.showUnitCost();
+		LBJ9.showOptCostMatrix();
+		LBJ9.getOptGraph();
+		FindOptCost LBJ10 = new FindOptCost(30);
+		LBJ10.Run(10);
+		FindOptCost LBJ11 = new FindOptCost(30);
+		LBJ11.Run(11);
+		FindOptCost LBJ12 = new FindOptCost(30);
+		LBJ12.Run(12);
+		FindOptCost LBJ13 = new FindOptCost(30);
+		LBJ13.Run(13);
+		FindOptCost LBJ14 = new FindOptCost(30);
+		LBJ14.Run(14);
+		FindOptCost LBJ15 = new FindOptCost(30);
+		LBJ15.Run(15);
+		LBJ15.showTrafficDemand();
+		LBJ15.showUnitCost();
+		LBJ15.showOptCostMatrix();
+		LBJ15.getOptGraph();
+
 	}									
 }
